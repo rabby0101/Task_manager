@@ -6,3 +6,605 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.quickEntryContainer {
+    padding: 10px;
+    margin: 10px;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.quickEntryPanel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.newTaskInput {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.addTaskButton {
+    background-color: var(--interactive-accent);
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.addTaskButton:hover {
+    background-color: var(--interactive-accent-hover);
+}
+
+.task-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    padding-bottom: 10px;
+    overflow-x: auto;
+}
+
+.task-tab {
+    flex: 0 0 auto;
+    font-size: 0.9em;
+    padding: 4px 8px;
+    white-space: nowrap;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.task-tab.active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.tasks-container {
+    margin: 15px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    padding-right: 120px; /* Space for the buttons */
+}
+
+.task-main-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.task-metadata-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 24px;
+    font-size: 0.9em;
+    overflow-x: auto;
+    padding-bottom: 4px; /* Add padding for the scrollbar */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+
+}
+
+/* Hide scrollbar for Chrome/Safari/Opera */
+.task-metadata-row::-webkit-scrollbar {
+    height: 4px;
+}
+
+.task-metadata-row::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+}
+
+.task-metadata-row::-webkit-scrollbar-thumb {
+    background: var(--background-modifier-border);
+    border-radius: 2px;
+}
+
+.task-actions {
+    position: absolute;
+    right: -120px; /* Hide buttons initially */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 4px;
+    transition: right 0.3s ease;
+    background: var(--background-primary);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.task-item:hover .task-actions {
+    right: 8px; /* Show buttons on hover */
+}
+
+.task-edit-btn,
+.task-delete-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.task-edit-btn {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.task-delete-btn {
+    background: var(--background-modifier-error);
+    color: var(--text-on-accent);
+}
+
+.task-edit-btn:hover,
+.task-delete-btn:hover {
+    opacity: 0.9;
+}
+
+/* Remove old button styles */
+.task-edit-buttons {
+    display: none;
+}
+
+.task-checkbox {
+    margin: 0;
+}
+
+.task-text {
+    flex: 1;
+    font-size: 1em;
+    padding: 2px 0;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+}
+
+.task-date {
+    padding: 5px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 5px;
+    background: var(--background-primary);
+    font-size: 0.9em;
+}
+
+.notice {
+    padding: 10px;
+    background: var(--background-modifier-error);
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.clock {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.task-input-form {
+    background: var(--background-secondary);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    padding: 10px;
+}
+
+.metadata-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--background-modifier-border);
+    width: 100%;
+    max-width: 100%;
+}
+
+.metadata-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    min-width: max-content; /* Ensure row doesn't shrink below content width */
+}
+
+/* Specific sizing for each input type */
+.project-select {
+    min-width: 150px;
+    width: 150px;
+    flex: 0 0 auto; /* Don't grow, don't shrink, use auto base size */
+}
+
+.priority-select {
+    min-width: 120px;
+    width: 120px;
+    flex: 0 0 auto;
+}
+
+.tag-input-container {
+    min-width: 200px;
+    width: 200px;
+    flex: 0 0 auto;
+}
+
+.due-date {
+    min-width: 150px;
+    width: 150px;
+    flex: 0 0 auto;
+}
+
+.text-input-section {
+    display: flex;
+    gap: 10px;
+    padding-top: 15px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.text-input-section input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 40px;
+}
+
+/* Remove redundant styles */
+.input-row,
+.text-input-row {
+    display: none;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Add this new style for the text input container */
+.text-input-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px; /* Add space between metadata and text input */
+}
+
+.project-select,
+.tag-select,
+.due-date,
+.priority-select {
+    padding: 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    background: var(--background-primary);
+    min-width: 100px;
+}
+
+.project-select:focus,
+.priority-select:focus,
+.tag-input:focus,
+.due-date:focus,
+.task-input:focus {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: -1px;
+}
+
+.project-select { order: 1; }
+.priority-select { order: 2; }
+.tag-input-container { order: 3; }
+.due-date { order: 4; }
+.task-input { order: 5; }
+
+.task-project {
+    font-size: 0.85em;
+    padding: 2px 6px;
+    background: var(--background-secondary);
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.task-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-right: 4px;
+    font-size: 12px;
+}
+
+.task-priority {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;  /* reduced padding */
+    border-radius: 4px;
+    font-size: 0.75em;  /* reduced font size */
+    font-weight: 500;   /* slightly reduced font weight */
+    margin-right: 6px;  /* reduced margin */
+    min-width: 45px;    /* reduced min-width */
+    justify-content: center;
+}
+
+.priority-high {
+    background-color: rgba(255, 0, 0, 0.15);
+    color: var(--text-normal);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    
+}
+
+.priority-medium {
+    background-color: rgba(0, 0, 255, 0.15);
+    color: var(--text-normal);
+    border: 1px solid rgba(0, 0, 255, 0.3);
+}
+
+.priority-low {
+    background-color: rgba(255, 255, 0, 0.15);
+    color: var(--text-normal);
+    border: 1px solid rgba(255, 255, 0, 0.3);
+}
+
+.tag-input-container {
+    position: relative;
+    width: 200px;
+}
+
+.tag-input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.selected-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.remove-tag {
+    margin-left: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.task-edit-form {
+    padding: 10px;
+    background: var(--background-secondary);
+    border-radius: 4px;
+}
+
+.edit-task-input {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 4px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+}
+
+.edit-task-metadata {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.edit-actions button {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-edit {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.cancel-edit {
+    background: var(--background-modifier-error);
+    color: var(--text-on-accent);
+}
+
+.edit-project-select,
+.edit-priority-select,
+.edit-due-date {
+    padding: 4px 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    background: var(--background-primary);
+    min-width: 120px;
+}
+
+.today-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.today {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.today:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.today-header {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.today-date {
+    color: var(--text-muted);
+    font-size: 0.9em;
+}
+
+.today.active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.today.active .today-date {
+    color: var(--text-on-accent);
+    opacity: 0.8;
+}
+
+.task-count {
+    display: inline-block;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-radius: 10px;
+    padding: 0 8px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.task-tab .task-count {
+    float: right;
+}
+
+.today .task-count {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.task-metadata {
+    display: flex;
+    align-items: center;
+    gap: 8px;  /* consistent gap between metadata items */
+    margin-left: auto; /* pushes metadata to the right */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    min-width: min-content; /* Ensure all items are visible */
+}
+
+.task-priority, .task-tag, .task-date, .task-project {
+    margin: 0 4px; /* even spacing between elements */
+    flex-shrink: 0; /* prevent items from shrinking */
+}
+
+.task-project {
+    order: -1; /* moves project name to the start of metadata */
+}
+
+/* Add these styles for circular checkbox */
+.task-item input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.task-item input[type="checkbox"]:checked {
+    background-color: var(--interactive-accent);
+    border-color: var(--interactive-accent);
+}
+
+.task-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+}
+
+.task-item input[type="checkbox"]:hover {
+    border-color: var(--interactive-accent);
+}
+
+.task-manager-view .view-header-nav-buttons,
+.task-manager-view .view-actions {
+    display: none !important;
+}
+
+.task-manager-view .view-header {
+    padding-left: 8px;
+}
+
+.task-manager-view,
+.task-manager-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.taskList {
+    width: 100%;
+    padding: 10px;
+}

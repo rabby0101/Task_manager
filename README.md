@@ -1,16 +1,39 @@
-# Obsidian Sample Plugin
+# Obsidian Task Manager
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A comprehensive task management plugin for Obsidian that helps you organize tasks with projects, priorities, and tags.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Features
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+- Project-based task organization
+- Priority levels (High, Medium, Low)
+- Tag support with emoji indicators
+- Due date tracking
+- Task filtering (Today, Todo, Overdue, Unplanned)
+- Quick task entry
+- Task editing and deletion
+- Task completion tracking
+
+## Installation
+
+### From Obsidian
+
+1. Open Settings > Community plugins
+2. Turn off Safe mode if enabled
+3. Click Browse community plugins
+4. Search for "Task Manager"
+5. Click Install
+6. Once installed, close the community plugins window and activate the newly installed plugin
+
+### Manual Installation
+
+1. Download the latest release
+2. Extract the zip archive in `.obsidian/plugins/` directory
+3. Reload Obsidian
+4. Enable plugin in community plugins settings
+
+## Usage
+
+1. Create a new note with frontmatter type: Project
 
 ## First time developing plugins?
 
