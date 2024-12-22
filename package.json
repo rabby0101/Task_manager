@@ -13,7 +13,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Rabby0101/Task_manage.git"
+		"url": "git+https://github.com/Rabby0101/Task_manager.git"
 	},
 	"devDependencies": {
 		"@types/node": "^16.11.6",
