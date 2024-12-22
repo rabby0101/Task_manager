@@ -1,10 +1,11 @@
 {
-    "id": "obsidian-task-manager",
+    "id": "task-manager",
     "name": "Task Manager",
-    "version": "1.0.0",
+    "version": "0.0.6",
     "minAppVersion": "0.15.0",
-    "description": "A comprehensive task management plugin for Obsidian with project organization, priorities, and tags.",
-    "author": "Your Name",
-    "authorUrl": "https://github.com/yourusername",
-    "isDesktopOnly": false
+    "description": "A comprehensive task management plugin for Obsidian",
+    "author": "Rabby0101",
+    "authorUrl": "https://github.com/Rabby0101",
+    "isDesktopOnly": false,
+    "repo": "Rabby0101/Task_manage"
 }

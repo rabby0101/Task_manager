@@ -1,16 +1,20 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "obsidian-task-manager",
+	"version": "0.0.6",
+	"description": "A comprehensive task management plugin for Obsidian",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": ["obsidian", "task-management", "todo"],
+	"author": "Rabby0101",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Rabby0101/Task_manage.git"
+	},
 	"devDependencies": {
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",

@@ -3,7 +3,7 @@ import { ItemView, WorkspaceLeaf, TFile, Notice } from 'obsidian';
 export const VIEW_TYPE_TASKS = 'task-manager';
 
 export class TaskView extends ItemView {
-    private container: HTMLElement;
+    private container!: HTMLElement;
     private currentNote: TFile | null;
     private activeTab: 'all' | 'today' | 'todo' | 'overdue' | 'unplanned' = 'all';
     private projects: string[] = [];
@@ -14,7 +14,7 @@ export class TaskView extends ItemView {
         { value: 'low', label: 'Low', color: 'yellow' }
     ];
     private allVaultTags: Set<string> = new Set();
-    private projectSelect: HTMLSelectElement;
+    private projectSelect!: HTMLSelectElement;
 
     navigation = false;
     options = {
