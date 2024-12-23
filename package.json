@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-task-manager",
-	"version": "0.0.6",
+	"version": "0.8.0",
 	"description": "A comprehensive task management plugin for Obsidian",
 	"main": "main.js",
 	"scripts": {

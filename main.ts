@@ -8,7 +8,7 @@ export default class TaskManagerPlugin extends Plugin {
         this.registerView(
             VIEW_TYPE_TASKS,
             (leaf) => {
-                const view = new TaskView(leaf);
+                const view = new TaskView(leaf, this);
                 this.taskView = view;
                 
                 // Set up input sequence after view is initialized
@@ -90,7 +90,7 @@ export default class TaskManagerPlugin extends Plugin {
 
         this.registerMarkdownCodeBlockProcessor('task-manager', (source, el, ctx) => {
             const container = el.createDiv('task-manager-embed');
-            const view = new TaskView(this.app.workspace.getLeaf(false));
+            const view = new TaskView(this.app.workspace.getLeaf(false), this);
             view.onOpen().then(() => {
                 container.appendChild(view.containerEl);
             });

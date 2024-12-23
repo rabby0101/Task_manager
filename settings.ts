@@ -23,16 +23,6 @@ export class TaskManagerSettingsTab extends PluginSettingTab {
 
         containerEl.createEl('h2', { text: 'Task Manager Settings' });
 
-        new Setting(containerEl)
-            .setName('Task Section Heading')
-            .setDesc('The section heading under which new tasks will be added (include markdown heading syntax)')
-            .addText(text => text
-                .setPlaceholder('## Tasks')
-                .setValue(this.plugin.settings.taskSection || '## Tasks') // Added fallback
-                .onChange(async (value) => {
-                    if (!value) value = '## Tasks'; // Ensure we always have a value
-                    this.plugin.settings.taskSection = value;
-                    await this.plugin.saveSettings();
-                }));
+        // No settings needed
     }
 }
