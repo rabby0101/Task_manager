@@ -1,8 +1,10 @@
 import { ItemView, WorkspaceLeaf, TFile, Notice } from 'obsidian';
+import TaskManagerPlugin from './main';
 
 export const VIEW_TYPE_TASKS = 'task-manager';
 
 export class TaskView extends ItemView {
+    plugin: TaskManagerPlugin;
     private container!: HTMLElement;
     private currentNote: TFile | null;
     private activeTab: 'all' | 'today' | 'todo' | 'overdue' | 'unplanned' | null = null;
@@ -21,8 +23,9 @@ export class TaskView extends ItemView {
         showRibbon: false
     };
 
-    constructor(leaf: WorkspaceLeaf) {
+    constructor(leaf: WorkspaceLeaf, plugin: TaskManagerPlugin) {
         super(leaf);
+        this.plugin = plugin;
         this.currentNote = this.app.workspace.getActiveFile();
         this.loadProjects();
         // Hide navigation buttons and menu
@@ -38,6 +41,19 @@ export class TaskView extends ItemView {
         this.navigation = false;
         (this.leaf as any).tabHeaderEl?.querySelector('.view-header-nav-buttons')?.remove();
         (this.leaf as any).tabHeaderEl?.querySelector('.view-actions')?.remove();
+
+        // Add styles for clickable project
+        const style = document.createElement('style');
+        style.textContent = `
+            .task-project.clickable {
+                cursor: pointer;
+                color: var(--link-color);
+            }
+            .task-project.clickable:hover {
+                color: var(--link-color-hover);
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     private async loadProjects() {
@@ -339,7 +355,7 @@ export class TaskView extends ItemView {
             const taskLine = `- [ ] ${text.trim()} ${metadata}`;
             const content = await this.app.vault.read(projectFile);
 
-            // Find or create Tasks section
+            // Find or create Tasks section (using hardcoded '## Tasks')
             const contentLines = content.split('\n');
             const taskSectionIndex = contentLines.findIndex(line => line.trim() === '## Tasks');
             
@@ -418,7 +434,7 @@ export class TaskView extends ItemView {
                     <span class="task-text">${this.formatTaskText(taskText)}</span>
                 </div>
                 <div class="task-metadata-row">
-                    <span class="task-project">${file.basename}</span>
+                    <span class="task-project clickable">${file.basename}</span>
                     ${this.formatTaskMetadata(task)}
                 </div>
             </div>
@@ -428,6 +444,12 @@ export class TaskView extends ItemView {
             </div>
         `;
         
+        // Add click handler for project name
+        const projectSpan = taskEl.querySelector('.task-project');
+        projectSpan?.addEventListener('click', () => {
+            this.app.workspace.getLeaf().openFile(file);
+        });
+
         const checkbox = taskEl.querySelector('input');
         checkbox?.addEventListener('change', () => this.toggleTask(task, isChecked, file));
 
