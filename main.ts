@@ -1,12 +1,15 @@
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, WorkspaceLeaf, TFile } from 'obsidian';
 import { TaskView, VIEW_TYPE_TASKS } from './TaskView';
 
 export default class TaskManagerPlugin extends Plugin {
+    private taskView: TaskView | null = null;
+
     async onload() {
         this.registerView(
             VIEW_TYPE_TASKS,
             (leaf) => {
                 const view = new TaskView(leaf);
+                this.taskView = view;
                 
                 // Set up input sequence after view is initialized
                 view.onload = async () => {
@@ -45,9 +48,40 @@ export default class TaskManagerPlugin extends Plugin {
                     // Setup sequence once DOM is ready
                     setTimeout(setupInputSequence, 0);
                 };
+
+                // Fix: Make onunload async and return a Promise
+                view.onunload = async () => {
+                    this.taskView = null;
+                    return Promise.resolve();
+                };
                 
                 return view;
             }
+        );
+
+        // Add file event listeners
+        this.registerEvent(
+            this.app.vault.on('modify', (file) => {
+                if (file instanceof TFile && this.taskView) {
+                    this.taskView.refresh();
+                }
+            })
+        );
+
+        this.registerEvent(
+            this.app.vault.on('delete', (file) => {
+                if (file instanceof TFile && this.taskView) {
+                    this.taskView.refresh();
+                }
+            })
+        );
+
+        this.registerEvent(
+            this.app.vault.on('create', (file) => {
+                if (file instanceof TFile && this.taskView) {
+                    this.taskView.refresh();
+                }
+            })
         );
 
         this.addRibbonIcon('checkbox-glyph', 'Task Manager', () => {
@@ -64,6 +98,7 @@ export default class TaskManagerPlugin extends Plugin {
     }
 
     async onunload() {
+        this.taskView = null;
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_TASKS);
     }
 

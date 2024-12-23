@@ -5,7 +5,7 @@ export const VIEW_TYPE_TASKS = 'task-manager';
 export class TaskView extends ItemView {
     private container!: HTMLElement;
     private currentNote: TFile | null;
-    private activeTab: 'all' | 'today' | 'todo' | 'overdue' | 'unplanned' = 'all';
+    private activeTab: 'all' | 'today' | 'todo' | 'overdue' | 'unplanned' | null = null;
     private projects: string[] = [];
     private tags: string[] = ['feature', 'bug', 'improvement']; // Default tags without #
     private priorities = [
@@ -79,6 +79,9 @@ export class TaskView extends ItemView {
     async onOpen() {
         await this.loadAllTags();
         const { containerEl } = this;
+        
+        // Initialize with 'all' as default tab
+        this.activeTab = 'all';
         
         this.container = containerEl.createDiv({
             cls: 'quickEntryContainer',
@@ -155,12 +158,15 @@ export class TaskView extends ItemView {
 
         this.registerDomEvents();
         this.registerTaskInputEvents();
-        await this.refreshTaskList();
-        this.updateTodayCount();
+        
+        // Remove initial refresh call
+        // Just update the counts without showing tasks
+        this.updateTabCounts();
     }
 
-    async onunload() {
-        // No clockInterval to clear
+    async onunload(): Promise<void> {
+        // Any cleanup code here
+        return Promise.resolve();
     }
 
     private async updateProjectSelect() {
@@ -177,7 +183,7 @@ export class TaskView extends ItemView {
         const addButton = this.container.querySelector('.addTaskButton');
         addButton?.addEventListener('click', () => this.addTask());
 
-        // Fix for tab click handling
+        // Modified tab click handling for toggle functionality
         const todayTab = this.container.querySelector('.today');
         const regularTabs = Array.from(this.container.querySelectorAll('.task-tab'));
         const allTabs = [...regularTabs];
@@ -185,14 +191,22 @@ export class TaskView extends ItemView {
 
         allTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
-                const clickedTab = e.currentTarget as HTMLElement; // Changed from e.target
+                const clickedTab = e.currentTarget as HTMLElement;
                 const tabType = clickedTab.dataset.tab as 'all' | 'today' | 'todo' | 'overdue' | 'unplanned';
                 
-                if (!tabType) return; // Add null check
+                if (!tabType) return;
                 
+                // If clicking the active tab, deactivate it
+                if (this.activeTab === tabType) {
+                    clickedTab.classList.remove('active');
+                    this.activeTab = null; // Set to null when deactivating
+                    this.clearTaskList(); // Clear the task list
+                    return;
+                }
+                
+                // Otherwise, activate the clicked tab
                 allTabs.forEach(t => t.classList.remove('active'));
                 clickedTab.classList.add('active');
-                
                 this.activeTab = tabType;
                 this.refreshTaskList();
             });
@@ -428,42 +442,49 @@ export class TaskView extends ItemView {
 
     private async editTask(taskEl: HTMLElement, originalTask: string, file: TFile) {
         // Create edit form
-        const editForm = createDiv('task-edit-form');
+        const editForm = createDiv({ cls: 'task-edit-form task-input-form' });
         const originalText = this.formatTaskText(originalTask.replace(/^- \[(x| )\] /, ''));
         const isChecked = originalTask.includes('[x]');
         
         editForm.innerHTML = `
-            <input type="text" class="edit-task-input" value="${originalText}">
-            <div class="edit-task-metadata">
-                <select class="edit-project-select">
-                    <option value="">Select Project</option>
-                    ${this.projects.map(p => 
-                        `<option value="${p}" ${file.basename === p ? 'selected' : ''}>
-                            ${p}
-                        </option>`
-                    ).join('')}
-                </select>
-                <select class="edit-priority-select">
-                    <option value="">Priority</option>
-                    ${this.priorities.map(p => 
-                        `<option value="${p.value}" ${originalTask.includes(p.label) ? 'selected' : ''}>
-                            ${p.label}
-                        </option>`
-                    ).join('')}
-                </select>
-                <div class="tag-input-container">
-                    <input type="text" class="edit-tag-input" placeholder="Add tags..." list="tag-suggestions">
-                    <div class="edit-selected-tags">
-                        ${this.getExistingTags(originalTask).map(tag => 
-                            `<span class="selected-tag">🔖 ${tag}<span class="remove-tag">×</span></span>`
+            <div class="metadata-section" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+                <div class="metadata-row" style="display: inline-flex; gap: 10px; padding-bottom: 5px;">
+                    <select class="edit-project-select project-select">
+                        <option value="">Select Project</option>
+                        ${this.projects.map(p => 
+                            `<option value="${p}" ${file.basename === p ? 'selected' : ''}>
+                                ${p}
+                            </option>`
                         ).join('')}
+                    </select>
+                    <select class="edit-priority-select priority-select">
+                        <option value="">Priority</option>
+                        ${this.priorities.map(p => 
+                            `<option value="${p.value}" ${originalTask.includes(p.label) ? 'selected' : ''}>
+                                ${p.label}
+                            </option>`
+                        ).join('')}
+                    </select>
+                    <div class="tag-input-container">
+                        <input type="text" class="edit-tag-input tag-input" placeholder="Add tags..." list="edit-tag-suggestions">
+                        <datalist id="edit-tag-suggestions">
+                            ${[...this.allVaultTags].map(t => `<option value="${t}">`).join('')}
+                        </datalist>
+                        <div class="edit-selected-tags selected-tags">
+                            ${this.getExistingTags(originalTask).map(tag => 
+                                `<span class="selected-tag">🔖 ${tag}<span class="remove-tag">×</span></span>`
+                            ).join('')}
+                        </div>
                     </div>
+                    <input type="date" class="edit-due-date due-date" value="${this.getExistingDate(originalTask)}">
                 </div>
-                <input type="date" class="edit-due-date" value="${this.getExistingDate(originalTask)}">
             </div>
-            <div class="edit-actions">
-                <button class="save-edit">Save</button>
-                <button class="cancel-edit">Cancel</button>
+            <div class="text-input-section">
+                <input type="text" class="edit-task-input task-input" value="${originalText}" placeholder="What needs to be done?">
+            </div>
+            <div class="edit-actions" style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="save-edit" style="flex: 1;">Save</button>
+                <button class="cancel-edit" style="flex: 1;">Cancel</button>
             </div>
         `;
 
@@ -471,6 +492,43 @@ export class TaskView extends ItemView {
         const originalContent = taskEl.innerHTML;
         taskEl.innerHTML = '';
         taskEl.appendChild(editForm);
+
+        // Add CSS to hide scrollbar and match new task form style
+        const style = document.createElement('style');
+        style.textContent = `
+            .task-edit-form .metadata-section::-webkit-scrollbar {
+                display: none;
+            }
+            .task-edit-form {
+                background: var(--background-primary);
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            .task-edit-form input,
+            .task-edit-form select {
+                height: 30px;
+                padding: 0 8px;
+                border-radius: 4px;
+                border: 1px solid var(--background-modifier-border);
+            }
+            .task-edit-form .edit-actions button {
+                padding: 6px 12px;
+                border-radius: 4px;
+                border: 1px solid var(--background-modifier-border);
+                background: var(--interactive-normal);
+                color: var(--text-normal);
+                cursor: pointer;
+            }
+            .task-edit-form .edit-actions button:hover {
+                background: var(--interactive-hover);
+            }
+            .task-edit-form .tag-input-container {
+                position: relative;
+                min-width: 120px;
+            }
+        `;
+        document.head.appendChild(style);
 
         // Setup edit form handlers
         this.setupEditFormHandlers(editForm, taskEl, originalContent, originalTask, file, isChecked);
@@ -645,6 +703,11 @@ export class TaskView extends ItemView {
 
         taskListContainer.empty();
         
+        // If no tab is active (null), don't show any tasks
+        if (this.activeTab === null) {
+            return;
+        }
+
         try {
             let allTasks: {text: string, file: TFile}[] = [];
             const projectFiles = this.app.vault.getMarkdownFiles()
@@ -672,14 +735,16 @@ export class TaskView extends ItemView {
             const counts = {
                 today: allTasks.filter(({ text: task }) => task.includes(`📅 ${today}`)).length,
                 todo: allTasks.filter(({ text: task }) => 
-                    !task.includes('[x]') && task.match(/📅 \d{4}-\d{2}-\d{2}/)
+                    !task.includes('[x]') && 
+                    task.match(/📅 \d{4}-\d{2}-\d{2}/)  // Has a date
                 ).length,
                 overdue: allTasks.filter(({ text: task }) => {
                     const dateMatch = task.match(/📅 (\d{4}-\d{2}-\d{2})/);
                     return dateMatch && !task.includes('[x]') && dateMatch[1] < today;
                 }).length,
                 unplanned: allTasks.filter(({ text: task }) => 
-                    !task.match(/📅 \d{4}-\d{2}-\d{2}/)
+                    !task.match(/📅 \d{4}-\d{2}-\d{2}/) && 
+                    !task.includes('[x]')  // Add this condition to filter out completed tasks
                 ).length
             };
 
@@ -695,9 +760,10 @@ export class TaskView extends ItemView {
                     allTasks = allTasks.filter(({ text: task }) => task.includes(`📅 ${today}`));
                     break;
                 case 'todo':
+                    // Updated to show all tasks with dates that aren't completed
                     allTasks = allTasks.filter(({ text: task }) => 
                         !task.includes('[x]') && 
-                        task.match(/📅 \d{4}-\d{2}-\d{2}/)
+                        task.match(/📅 \d{4}-\d{2}-\d{2}/)  // Has a date
                     );
                     break;
                 case 'overdue':
@@ -710,7 +776,10 @@ export class TaskView extends ItemView {
                     });
                     break;
                 case 'unplanned':
-                    allTasks = allTasks.filter(({ text: task }) => !task.match(/📅 \d{4}-\d{2}-\d{2}/));
+                    allTasks = allTasks.filter(({ text: task }) => 
+                        !task.match(/📅 \d{4}-\d{2}-\d{2}/) && 
+                        !task.includes('[x]')  // Add this condition to filter out completed tasks
+                    );
                     break;
             }
 
@@ -721,6 +790,67 @@ export class TaskView extends ItemView {
         } catch (error) {
             console.error("Error refreshing task list:", error);
             taskListContainer.innerHTML = '<div class="notice">Error loading tasks. Please try again.</div>';
+        }
+    }
+
+    // Add new method to clear task list
+    private clearTaskList() {
+        const taskListContainer = this.container.querySelector('.taskList');
+        if (taskListContainer) {
+            taskListContainer.empty();
+        }
+    }
+
+    // Add new method to update tab counts without showing tasks
+    private async updateTabCounts() {
+        const today = new Date().toISOString().split('T')[0];
+        try {
+            let allTasks: {text: string, file: TFile}[] = [];
+            const projectFiles = this.app.vault.getMarkdownFiles()
+                .filter(file => {
+                    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+                    return frontmatter?.type === 'Project';
+                });
+
+            // Collect tasks for counting
+            for (const file of projectFiles) {
+                const content = await this.app.vault.read(file);
+                const lines = content.split('\n');
+                const taskSectionIndex = lines.findIndex(line => line.trim() === '## Tasks');
+                
+                if (taskSectionIndex !== -1) {
+                    const tasks = lines.slice(taskSectionIndex + 1)
+                        .filter(line => line.match(/^- \[(x| )\]/))
+                        .map(task => ({ text: task, file }));
+                    allTasks = allTasks.concat(tasks);
+                }
+            }
+
+            // Update counts
+            const counts = {
+                today: allTasks.filter(({ text: task }) => task.includes(`📅 ${today}`)).length,
+                // Updated todo count to match new filter
+                todo: allTasks.filter(({ text: task }) => 
+                    !task.includes('[x]') && 
+                    task.match(/📅 \d{4}-\d{2}-\d{2}/)  // Has a date
+                ).length,
+                overdue: allTasks.filter(({ text: task }) => {
+                    const dateMatch = task.match(/📅 (\d{4}-\d{2}-\d{2})/);
+                    return dateMatch && !task.includes('[x]') && dateMatch[1] < today;
+                }).length,
+                unplanned: allTasks.filter(({ text: task }) => 
+                    !task.match(/📅 \d{4}-\d{2}-\d{2}/) && 
+                    !task.includes('[x]')
+                ).length
+            };
+
+            // Update count displays
+            Object.entries(counts).forEach(([tab, count]) => {
+                const countEl = this.container.querySelector(`[data-tab-count="${tab}"]`);
+                if (countEl) countEl.textContent = count.toString();
+            });
+        } catch (error) {
+            console.error("Error updating tab counts:", error);
         }
     }
 
@@ -868,5 +998,35 @@ export class TaskView extends ItemView {
             dueDateInput.value
         );
         this.updateTodayCount();
+    }
+
+    async refresh() {
+        // Clear existing tasks
+        this.containerEl.querySelector('.task-list')?.empty();
+        
+        // Re-load tasks
+        await this.loadTasks();
+        
+        // Re-render view
+        await this.render();
+    }
+
+    private async render() {
+        // Clear existing content
+        this.containerEl.empty();
+        
+        // Re-create the container
+        this.container = this.containerEl.createDiv({
+            cls: 'quickEntryContainer',
+            attr: { style: 'width: 100%; max-width: 100%;' }
+        });
+        
+        // Re-initialize the view
+        await this.onOpen();
+    }
+
+    private async loadTasks() {
+        // Your existing task loading logic
+        // ...existing code...
     }
 }
